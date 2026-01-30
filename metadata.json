@@ -1,0 +1,7 @@
+{
+  "name": "VisionPrompt AI",
+  "description": "A professional-grade tool that transforms your images into highly detailed, creative prompts using Gemini AI. Features history tracking and a modern, responsive design.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
