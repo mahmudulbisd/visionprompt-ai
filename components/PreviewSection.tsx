@@ -29,7 +29,6 @@ const PreviewSection: React.FC<PreviewSectionProps> = ({
   return (
     <div className="space-y-8 animate-in fade-in zoom-in-95 duration-500">
       <div className="flex flex-col md:flex-row gap-8 items-start">
-        {/* Image Display */}
         <div className="w-full md:w-1/2">
           <div className="relative group rounded-3xl overflow-hidden shadow-2xl bg-black border border-gray-200">
             <img 
@@ -55,7 +54,6 @@ const PreviewSection: React.FC<PreviewSectionProps> = ({
           </div>
         </div>
 
-        {/* Action & Result */}
         <div className="w-full md:w-1/2 space-y-6">
           {!currentPrompt && !isGenerating ? (
             <div className="bg-white rounded-3xl p-8 border border-gray-100 shadow-sm space-y-6 text-center md:text-left">
@@ -85,7 +83,7 @@ const PreviewSection: React.FC<PreviewSectionProps> = ({
               </div>
               <div className="text-center space-y-2">
                 <h4 className="font-bold text-xl text-gray-900">Analyzing Image...</h4>
-                <p className="text-gray-500 text-sm italic">Deconstructing lighting, textures, and composition...</p>
+                <p className="text-gray-500 text-sm italic">Gemini is deconstructing lighting and composition...</p>
               </div>
             </div>
           )}
@@ -131,11 +129,14 @@ const PreviewSection: React.FC<PreviewSectionProps> = ({
           )}
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl flex items-center space-x-3">
-              <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <p className="text-sm font-medium">{error}</p>
+            <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl flex flex-col space-y-2">
+              <div className="flex items-center space-x-3">
+                <svg className="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p className="text-sm font-bold">API Error</p>
+              </div>
+              <p className="text-xs">{error}</p>
             </div>
           )}
         </div>

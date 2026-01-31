@@ -45,7 +45,6 @@ const App: React.FC = () => {
     };
     reader.readAsDataURL(file);
     
-    // Reset state for new image
     setGenState({
       isGenerating: false,
       error: null,
@@ -59,9 +58,8 @@ const App: React.FC = () => {
     setGenState(prev => ({ ...prev, isGenerating: true, error: null }));
 
     try {
-      // UX improvement: ensure analysis feels substantial (min 2s)
       const apiPromise = generatePromptFromImage(previewUrl, selectedFile.type);
-      const delayPromise = new Promise(resolve => setTimeout(resolve, 2000));
+      const delayPromise = new Promise(resolve => setTimeout(resolve, 1500));
       
       const [prompt] = await Promise.all([apiPromise, delayPromise]);
 
@@ -71,7 +69,6 @@ const App: React.FC = () => {
         currentPrompt: prompt as string,
       });
 
-      // Add to history
       const newItem: HistoryItem = {
         id: crypto.randomUUID(),
         timestamp: Date.now(),
@@ -115,7 +112,6 @@ const App: React.FC = () => {
       <Header />
       
       <main className="max-w-4xl mx-auto px-4 mt-12 space-y-16">
-        {/* Input Section */}
         <section className="flex flex-col items-center">
           {!previewUrl ? (
             <div className="w-full max-w-xl">
@@ -134,7 +130,6 @@ const App: React.FC = () => {
           )}
         </section>
 
-        {/* History Section */}
         <section>
           <HistorySection 
             history={history} 
@@ -144,7 +139,7 @@ const App: React.FC = () => {
       </main>
 
       <footer className="mt-20 py-8 text-center text-gray-400 text-sm border-t border-gray-100">
-        <p>&copy; {new Date().getFullYear()} VisionPrompt AI. Powered by OpenAI.</p>
+        <p>&copy; {new Date().getFullYear()} VisionPrompt AI. Powered by Gemini AI.</p>
       </footer>
     </div>
   );

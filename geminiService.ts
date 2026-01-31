@@ -1,7 +1,9 @@
 
+import { GoogleGenAI, GenerateContentResponse } from "@google/genai";
+
 /**
- * Service to interact with AI models for image analysis.
- * Updated to use OpenAI GPT-4o vision model as requested.
+ * Service to interact with Gemini AI for image analysis.
+ * Uses the latest Gemini 3 Flash model for prompt generation.
  */
 export const generatePromptFromImage = async (
   base64Image: string,
@@ -10,53 +12,42 @@ export const generatePromptFromImage = async (
   const API_KEY = process.env.API_KEY || "";
   
   try {
-    // Stripping the data URL prefix if it exists to get raw base64 data
+    const ai = new GoogleGenAI({ apiKey: API_KEY });
+    
+    // Extract raw base64 data from Data URL
     const dataOnly = base64Image.split(',')[1] || base64Image;
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o",
-        messages: [
+    const response: GenerateContentResponse = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: {
+        parts: [
           {
-            role: "user",
-            content: [
-              { 
-                type: "text", 
-                text: "Analyze this image in extreme detail. Generate a high-quality, creative 'prompt' that could be used in an AI image generator (like Midjourney or DALL-E) to recreate this image. Focus on artistic style, camera settings, lighting, color palette, composition, and specific subject details. Keep the output as a single, powerful descriptive paragraph." 
-              },
-              {
-                type: "image_url",
-                image_url: {
-                  url: `data:${mimeType};base64,${dataOnly}`,
-                },
-              },
-            ],
+            inlineData: {
+              mimeType: mimeType,
+              data: dataOnly,
+            },
+          },
+          {
+            text: "Analyze this image in extreme detail. Generate a high-quality, creative 'prompt' that could be used in an AI image generator (like Midjourney or DALL-E) to recreate this image. Focus on artistic style, camera settings, lighting, color palette, composition, and specific subject details. Keep the output as a single, powerful descriptive paragraph.",
           },
         ],
-        max_tokens: 500
-      }),
+      },
     });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error?.message || `OpenAI API error: ${response.statusText}`);
+    if (!response.text) {
+      throw new Error("Gemini returned an empty response.");
     }
 
-    const result = await response.json();
-    return result.choices[0]?.message?.content?.trim() || "Failed to generate a prompt. Please try again.";
+    return response.text;
   } catch (error) {
-    console.error("AI API Error:", error);
+    console.error("Gemini API Error:", error);
     
-    // Check for specific common OpenAI errors
-    if (error instanceof Error && error.message.includes("401")) {
-      return "Authentication error: The provided API key is invalid or has expired.";
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
+    
+    if (errorMessage.includes("API_KEY_INVALID") || errorMessage.includes("401")) {
+      throw new Error("Invalid Gemini API Key. Please check your environment configuration.");
     }
     
-    return `An error occurred while generating the prompt. (${error instanceof Error ? error.message : 'Unknown error'})`;
+    throw new Error(`Failed to generate prompt: ${errorMessage}`);
   }
 };
